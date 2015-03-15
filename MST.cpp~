@@ -264,10 +264,16 @@ void MST::makeTSP1_5()
 
    Euler euler(N);
 
+bool dup [N][N];
+for(int i=0; i<N; i++)
+   for(int j=0; j<N; j++)
+      dup[i][j]=false;
+
    for(std::multimap<int, int>::iterator it=combined->begin(); it!=combined->end(); ++it)
    {
-      if(it->first > it->second)
+      if(it->first > it->second && !dup[it->first][it->second])
       {
+         dup[it->first][it->second]=true;
          euler.addEdge(it->first, it->second);
       }
    }

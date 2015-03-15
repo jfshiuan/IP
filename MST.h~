@@ -31,6 +31,15 @@ class MST {
       void makeTSP1_5();
       void LoadInput(int& node_num, int& edge_num, int*&edges, int*& weights, int *oddVertices, int numOdd);
       void PrintMatching(int node_num, PerfectMatching* pm, int *oddVertices);
+
+
+      //int find(int prev, int current, int range);
+
       float calcSum(int option);
+
+
+
+
       int minKey(int key[], bool mstSet[]);
+
 };

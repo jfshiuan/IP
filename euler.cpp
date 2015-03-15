@@ -1,0 +1,164 @@
+/*
+ * Used for Fleury's algorithm.
+ * Source: http://www.geeksforgeeks.com/fleurys-algorithm-for-printing-eulerian-path
+ */
+
+#include "euler.h"
+
+Euler::Euler(int N)
+{
+   this->N=N;
+   adj = new list<int>[N];
+   adjcopy = new list<int>[N];
+   tour = new list<int>;
+}
+
+Euler::~Euler()
+{
+   delete [] adj;
+   delete [] adjcopy;
+   adj=nullptr;
+   adjcopy=nullptr;
+}
+
+void Euler::addEdge(int u, int v)
+{
+   adj[u].push_back(v);
+   adj[v].push_back(u);
+}
+
+
+void Euler::removeEdge(int u, int v)
+{
+   list<int>::iterator itv = find(adj[u].begin(), adj[u].end(), v);
+   *itv = -1;
+
+   list<int>::iterator itu = find(adj[v].begin(), adj[v].end(), u);
+   *itu=-1;
+}
+
+
+std::list<int> * Euler::getTour()
+{
+   int u=0;
+   for(int i=0; i<N; i++)
+   {
+      if(adj[i].size() % 2 == 1)
+      {
+         u=i;
+         break;
+      }
+   }
+
+   getTourUtil(u);
+   return tour;
+}
+
+void Euler::getTourUtil(int u)
+{
+   tour->push_back(u);
+
+   for(std::list<int>::iterator it=adj[u].begin(); it!=adj[u].end(); ++it)
+   {
+      int v = *it;
+      if(v!=-1 && isValidNextEdge(u, v))
+      {
+         removeEdge(u, v);
+         getTourUtil(v);
+      }
+   }
+}
+
+
+int Euler::DFSCount(int v, bool visited[])
+{
+   visited[v] = true;
+   int count = 1;
+   list<int>::iterator it;
+
+   for(it=adj[v].begin(); it!=adj[v].end(); ++it)
+   {
+      if(*it!=-1 && !visited[*it])
+      {
+         count += DFSCount(*it, visited);
+      }
+   }
+
+   return count;
+}
+
+void Euler::createCopy(int u, int v)
+{
+   delete [] adjcopy;
+   adjcopy = new list<int>[N];
+
+   for(int i=0; i<N; i++)
+   {
+      for(std::list<int>::iterator it=adj[i].begin(); it!=adj[i].end(); ++it)
+      {
+         adjcopy[i].push_back(*it);
+      }
+   }
+
+   std::list<int>::iterator iv = find(adjcopy[u].begin(), adjcopy[u].end(), v);
+   *iv = -1;
+   std::list<int>::iterator iu = find(adjcopy[v].begin(), adjcopy[v].end(), u);
+   *iu=-1;
+}
+
+
+int Euler::DFSCountCopy(int v, bool visited[])
+{
+   visited[v]=true;
+   int count=1;
+
+   for(std::list<int>::iterator it=adjcopy[v].begin(); it!=adjcopy[v].end(); ++it)
+   {
+      if(*it != -1 && !visited[*it])
+      {
+         count += DFSCountCopy(*it, visited);
+      }
+   }
+
+   return count;
+}
+
+
+bool Euler::isValidNextEdge(int u, int v)
+{
+   int count = 0;
+   list<int>::iterator it;
+
+   for(it = adj[u].begin(); it!=adj[u].end(); ++it)
+   {
+      if(*it!=-1)
+      {
+         count++;
+      }
+   }
+
+   if(count == 1)
+   {
+      return true;
+   }
+
+   bool visited[N];
+
+   for(int i=0; i<N; i++)
+   {
+      visited[i]=false;
+   }
+
+   int count1 = DFSCount(u, visited);
+
+   createCopy(u, v);
+
+   for(int i=0; i<N; i++)
+   {
+      visited[i]=false;
+   }
+
+   int count2 = DFSCountCopy(u, visited);
+   return (count1 <= count2);
+}
+
