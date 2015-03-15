@@ -2,6 +2,7 @@
 #include "point.h"
 #include "MST.h"
 #include <cmath>
+#include <time.h>
 
 /*
    This project is a starter code and wrappers for CSE101W15 Implementation project.
@@ -30,9 +31,17 @@ int main()
    int W, H, N;
    Point * pointset;
 
-   W = 18357;
-   H = 15433;
-   N = 8876;
+clock_t start=0;
+clock_t end=0;
+clock_t start2=0;
+clock_t start3=0;
+clock_t end2=0;
+clock_t end3=0;
+
+
+   W = 100;
+   H = 100;
+   N = 100;
    int numTrials=100;
    cout<<"W: "<<W<<" H: "<<H<<" N:"<<N<<endl;
 
@@ -46,6 +55,9 @@ int main()
 
    MST * mst;
 
+   double time1=0;
+   double time2=0;
+   double time3=0;
 
    for(int i=0; i<numTrials; i++)
    {
@@ -54,10 +66,21 @@ int main()
       //pointset->printPointset();
 
       mst = new MST(pointset->getAdjacentMatrix(), N);
+      start=clock();
       mst->makeTree();
+      end=clock();
+      start2=clock();
       mst->createMap();
       mst->makeTSP2();
+      end2=clock();
+      start3=clock();
       mst->makeTSP1_5();
+      end3=clock();
+
+
+time1= time1 + (double)(end-start)/CLOCKS_PER_SEC/(double)numTrials;
+time2= time2 + (double)(end2-start2)/CLOCKS_PER_SEC/(double)numTrials;
+time3= time3 + (double)(end3-start3)/CLOCKS_PER_SEC/(double)numTrials;
 
       //mst->printMST();
       sum[i]= mst->calcSum(MST_1);
@@ -95,6 +118,10 @@ int main()
    cout<<"standard deviation TSP2: "<<deviationTSP2<<"\n";
    cout<<"meanTSP1_5: "<<meanTSP1_5<<"\n";
    cout<<"standard deviation TSP1_5: "<<deviationTSP1_5<<"\n";
+
+printf("%f seconds\n", time1);
+printf("%f seconds\n", time2);
+printf("%f seconds\n", time3);
 
    return 0;
 }
